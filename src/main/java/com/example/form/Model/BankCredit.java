@@ -2,8 +2,11 @@ package com.example.form.Model;
 
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
 
 @Getter
 @Setter
@@ -22,12 +25,17 @@ public class BankCredit {
     private Long id;
 
     @NotNull
+    @NotEmpty
     @Column(name = "name")
     private String name;
 
+    @NotNull
     @Column(name = "cnp")
+    @Length(min = 13, max = 13, message = "Introduceti un CNP valid!")
     private String cnp;
 
+    @NotNull
+    @Email(message = "Introduceti o adresa valida!")
     @Column(name = "email")
     private String email;
 
@@ -45,6 +53,8 @@ public class BankCredit {
     valoare imprummut
      */
     @NotNull
+    @Min(value=500, message = "Valoare imprumut prea mic!")
+    @Max(value=100000, message = "Valoare imprumut prea mare!")
     @Column(name = "money")
     private Integer money;
 

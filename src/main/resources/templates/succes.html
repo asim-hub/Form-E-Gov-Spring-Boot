@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<style>
+    .background {
+            position: center;
+        }
+        .background::before {
+            content: "";
+            background-image: url('https://c4.wallpaperflare.com/wallpaper/174/502/417/pen-business-contract-entrepreneur-wallpaper-thumb.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+            left: 0px;
+            height: 100%;
+
+        }
+
+</style>
+<head>
+    <meta charset="UTF-8">
+    <title>Succes</title>
+</head>
+<body>
+<div class="background">
+</div>
+<div style="opacity:0.9" class ="col-lg-6 col-md-6 col-sm-6 container justify-content-center card ">
+<div align="center">
+    <br><br><br><br><br><br>
+    <h1 style="color:black;text-align:center;font-size:2vw" class="text-light">Cererea a fost efectuata cu succes!</h1>
+    <div class="btn-group mt-2 mb-4" role="group" aria-label="actionButtons">
+        <td>
+            <a th:href="@{/download/{id}(id=${bankCredit.id})}" class="d-block btn btn-outline-light" style="color:black; font-size:1.5vw" >Descarca raport <i class="fas fa-file-download mr-2"></i></a>
+            <br>
+            <a th:href="@{/newBankRequest}" class="d-block btn btn-outline-light" style="color:black; font-size:1.5vw" >Inapoi <i class="fas mr-2"></i></a>
+
+        </td>
+    </div>
+</div>
+</div>
+</body>
+</html>
