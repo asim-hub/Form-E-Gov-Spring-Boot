@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class FormApplication {
 
 	public static void main(String[] args) {
+		// pentru a afisa datele in format xml
+		// SELECT * FROM bank_credit
+		// FOR XML PATH
 		SpringApplication.run(FormApplication.class, args);
 	}
 

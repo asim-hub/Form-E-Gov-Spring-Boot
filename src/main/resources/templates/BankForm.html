@@ -59,7 +59,7 @@
 
           <div class ="form-group">
             <label> Moneda: </label>
-            <select  id="category1" name="category" th:field="*{currency}">
+            <select  id="moneda" onchange="addressFunction()" name="category" th:field="*{currency}" >
                 <option value="EUR">EUR</option>
                 <option value="RON">RON</option>
                 <option value="USD">USD</option>
@@ -71,7 +71,7 @@
 
           <div class ="form-group">
             <label> Tip credit: </label>
-            <select  id="category2" name="category" th:field="*{creditType}">
+            <select  id="tipCred" onchange="addressFunction()" name="category" th:field="*{creditType}">
               <option value="CREDIT_NEVOI_PERSONALE">Credit nevoi personale</option>
               <option value="CREDIT_IMOBILIARE">Credit imobiliare</option>
               <option value="CREDIT_IPOTECAR">Credit ipotecar</option>
@@ -81,20 +81,32 @@
 
           <div class ="form-group">
             <label> Tip dobanda: </label>
-            <select  id="category3" name="category" th:field="*{interestType}">
+            <select  id="tipDob" onchange="addressFunction()" name="category" th:field="*{interestType}">
               <option value="FIX">Fixa</option>
               <option value="VARIABLE">Variabila</option>
             </select>
           </div>
 
           <div class ="form-group">
+            <label> Durata creditare: </label>
+            <select  id="duration" onchange="creditFunction()" name="category" th:field="*{duration}">
+              <option value="12">1 an</option>
+              <option value="24">2 ani</option>
+              <option value="48">4 ani</option>
+              <option value="96">8 ani</option>
+              <option value="193">16 ani</option>
+              <option value="386">32 ani</option>
+            </select>
+          </div>
+
+          <div class ="form-group">
             <label> Dobanda %: </label>
-            <input type = "text" name = "credit_interest" th:field = "*{credit_interest}" placeholder="Dobanda" autofocus="true" required/>
+            <input  type = "text" id="credit_interest" name = "credit_interest" th:field = "*{credit_interest}" placeholder="Dobanda" autofocus="true" required/>
           </div>
 
           <div class ="form-group">
             <label> Suma dorita: </label>
-            <input type = "text" name = "money" th:field = "*{money}" placeholder="Suma" id="money" autofocus="true" required/>
+            <input type = "text" onchange="creditFunction()" name = "money" th:field = "*{money}" placeholder="Suma" id="money" autofocus="true" required/>
             <div class="alert alert-warning" th:if="${#fields.hasErrors('money')}" th:errors="*{money}"></div>
           </div>
 
@@ -120,7 +132,109 @@
     </div>
   </div>
 </div>
-<!--<script src="index.js"></script>-->
+<script>
+    document.getElementById("credit_interest").defaultValue = 10;
+    document.getElementById("money").defaultValue = 0;
+    document.getElementById("money_back").defaultValue = 0;
+    document.getElementById("rate").defaultValue = 0;
+
+    function addressFunction() {
+        var element1 = document.getElementById("moneda");
+        var element2 = document.getElementById("tipCred");
+        var element3 = document.getElementById("tipDob");
+        if (element1.value == "RON" && element2.value == "CREDIT_NEVOI_PERSONALE" && element3.value == "FIX") {
+            document.getElementById("credit_interest").value = 5;creditFunction();
+        } else if (element1.value == "RON" && element2.value == "CREDIT_NEVOI_PERSONALE" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 6;creditFunction();
+        } else if (element1.value == "RON" && element2.value == "CREDIT_IMOBILIARE" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 8;creditFunction();
+        } else if (element1.value == "RON" && element2.value == "CREDIT_IMOBILIARE" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 5;creditFunction();
+        } else if (element1.value == "RON" && element2.value == "CREDIT_IPOTECAR" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 9;creditFunction();
+        } else if (element1.value == "RON" && element2.value == "CREDIT_IPOTECAR" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 8;creditFunction();
+        } else if (element1.value == "RON" && element2.value == "CREDIT_AUTO" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 4;creditFunction();
+        } else if (element1.value == "RON" && element2.value == "CREDIT_AUTO" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 7;creditFunction();
+        }
+
+        if (element1.value == "EUR" && element2.value == "CREDIT_NEVOI_PERSONALE" && element3.value == "FIX") {
+            document.getElementById("credit_interest").value = 10;creditFunction();
+        } else if (element1.value == "EUR" && element2.value == "CREDIT_NEVOI_PERSONALE" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 13;creditFunction();
+        } else if (element1.value == "EUR" && element2.value == "CREDIT_IMOBILIARE" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 11;creditFunction();
+        } else if (element1.value == "EUR" && element2.value == "CREDIT_IMOBILIARE" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 14;creditFunction();
+        } else if (element1.value == "EUR" && element2.value == "CREDIT_IPOTECAR" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 12;creditFunction();
+        } else if (element1.value == "EUR" && element2.value == "CREDIT_IPOTECAR" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 15;creditFunction();
+        } else if (element1.value == "EUR" && element2.value == "CREDIT_AUTO" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 13;creditFunction();
+        } else if (element1.value == "EUR" && element2.value == "CREDIT_AUTO" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 16;creditFunction();
+        }
+
+        if (element1.value == "USD" && element2.value == "CREDIT_NEVOI_PERSONALE" && element3.value == "FIX") {
+            document.getElementById("credit_interest").value = 9;creditFunction();
+        } else if (element1.value == "USD" && element2.value == "CREDIT_NEVOI_PERSONALE" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 12;creditFunction();
+        } else if (element1.value == "USD" && element2.value == "CREDIT_IMOBILIARE" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 10;creditFunction();
+        } else if (element1.value == "USD" && element2.value == "CREDIT_IMOBILIARE" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 13;creditFunction();
+        } else if (element1.value == "USD" && element2.value == "CREDIT_IPOTECAR" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 11;creditFunction();
+        } else if (element1.value == "USD" && element2.value == "CREDIT_IPOTECAR" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 14;creditFunction();
+        } else if (element1.value == "USD" && element2.value == "CREDIT_AUTO" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 12;creditFunction();
+        } else if (element1.value == "USD" && element2.value == "CREDIT_AUTO" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 15;creditFunction();
+        }
+
+        if (element1.value == "CNF" && element2.value == "CREDIT_NEVOI_PERSONALE" && element3.value == "FIX") {
+            document.getElementById("credit_interest").value = 15;creditFunction();
+        } else if (element1.value == "CNF" && element2.value == "CREDIT_NEVOI_PERSONALE" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 6;creditFunction();
+        } else if (element1.value == "CNF" && element2.value == "CREDIT_IMOBILIARE" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 13;creditFunction();
+        } else if (element1.value == "CNF" && element2.value == "CREDIT_IMOBILIARE" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 7;creditFunction();
+        } else if (element1.value == "CNF" && element2.value == "CREDIT_IPOTECAR" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 10;creditFunction();
+        } else if (element1.value == "CNF" && element2.value == "CREDIT_IPOTECAR" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 8;creditFunction();
+        } else if (element1.value == "CNF" && element2.value == "CREDIT_AUTO" && element3.value == "FIX") {
+        document.getElementById("credit_interest").value = 7;creditFunction();
+        } else if (element1.value == "CNF" && element2.value == "CREDIT_AUTO" && element3.value == "VARIABLE") {
+        document.getElementById("credit_interest").value = 9;creditFunction();
+        }
+
+        if (element1.value == "BTC" || element1.value == "ETH") {
+            document.getElementById("credit_interest").value = 25;creditFunction();
+        }
+        }
+
+        function creditFunction() {
+          var element1 = document.getElementById("money");
+          if (element1.value != 0) {
+            document.getElementById("money_back").value = parseFloat((element1.value  *  (1 + (document.getElementById("credit_interest").value / 100))) + (0.003 * document.getElementById("duration").value * element1.value)).toFixed(2)
+            rateFunction();
+          }
+        }
+
+        function rateFunction() {
+          var element1 = document.getElementById("money_back");
+          var element2 = document.getElementById("duration");
+          if (element1.value != 0) {
+            document.getElementById("rate").value = parseFloat(element1.value / element2.value).toFixed(2)
+          }
+          }
+</script>
 </body>
 
 </html>

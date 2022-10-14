@@ -3,7 +3,6 @@ package com.example.form.Model;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
-
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import javax.validation.constraints.Email;
@@ -25,7 +24,6 @@ public class BankCredit {
     private Long id;
 
     @NotNull
-    @NotEmpty
     @Column(name = "name")
     private String name;
 
@@ -54,20 +52,20 @@ public class BankCredit {
      */
     @NotNull
     @Min(value=500, message = "Valoare imprumut prea mic!")
-    @Max(value=100000, message = "Valoare imprumut prea mare!")
+    @Max(value=1000000, message = "Valoare imprumut prea mare!")
     @Column(name = "money")
-    private Integer money;
+    private float money;
 
     /*
     prima rata
      */
     @NotNull
     @Column(name = "rate")
-    private Integer rate;
+    private float rate;
 
     @NotNull
     @Column(name = "money_back")
-    private Integer money_back;
+    private float money_back;
 
     /*
     dobanda
@@ -84,8 +82,11 @@ public class BankCredit {
     @Column(name = "interestType ")
     private Interest interestType;
 
-
-
-
+    /*
+    * durata acreditare
+    */
+    @NotNull
+    @Column(name = "duration ")
+    private Integer duration;
 
 }
