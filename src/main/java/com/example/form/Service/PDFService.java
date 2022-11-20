@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class PDFService {
@@ -78,6 +79,32 @@ public class PDFService {
         document.add(par8);
         document.add(par9);
         document.add(par10);
+        document.close();
+    }
+
+    public void generateAll(HttpServletResponse response,  List<BankCredit> bankCreditList) throws IOException, DocumentException {
+        Document document = new Document(PageSize.A4);
+
+        PdfWriter.getInstance(document, response.getOutputStream());
+
+        document.open();
+
+        Font fontTitle = FontFactory.getFont(FontFactory.TIMES_ROMAN);
+        fontTitle.setSize(18);
+
+        Font fontSubTitle = FontFactory.getFont(FontFactory.TIMES_ROMAN);
+        fontSubTitle.setSize(14);
+
+        Font fontParagraph = FontFactory.getFont(FontFactory.TIMES_ROMAN);
+        fontParagraph.setSize(12);
+
+        Paragraph par_title1 = new Paragraph("DATE CREDIT BANCAR",
+                fontTitle);
+
+
+        document.add(par_title1);
+        document.add(Chunk.NEWLINE);
+
         document.close();
     }
 }

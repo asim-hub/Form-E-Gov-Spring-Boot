@@ -2,6 +2,7 @@ package com.example.form.Controller;
 
 import com.example.form.Model.BankCredit;
 import com.example.form.Model.Email;
+import com.example.form.Service.ConverterService;
 import com.example.form.Service.PDFService;
 import com.example.form.ServiceImplement.BankCreditServiceImplement;
 import com.example.form.ServiceImplement.EmailServiceImplement;
@@ -10,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +19,10 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Controller
@@ -34,6 +35,9 @@ public class FormController {
 
     @Autowired
     private EmailServiceImplement emailServiceImplement;
+
+    @Autowired
+    ConverterService converter;
 
     @GetMapping({"/newBankRequest", "/"})
     public String newBankRequest(Model model) throws ExecutionException, InterruptedException{
@@ -72,5 +76,37 @@ public class FormController {
         emailServiceImplement.sendEmail(email);
 
     }
+
+    /*
+    @GetMapping("/downloadAll")
+    public void downloadAll(HttpServletResponse response, Model model) throws ExecutionException, IOException, DocumentException {
+        List<BankCredit> bankCreditList = bankCreditServiceImplement.getAllBankCredit();
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd:hh:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=Statistici" + currentDateTime + ".pdf";
+        response.setHeader(headerKey, headerValue);
+        pdfService.generateAll(response, bankCreditList);
+        model.addAttribute("bankCredit", new BankCredit());
+    }
+    */
+
+
+    @GetMapping(value="/downloadAll", produces = "application/pdf")
+    @ResponseBody
+    public void exportToPDF(HttpServletResponse response) throws DocumentException, IOException {
+//        response.setContentType("application/pdf");
+//        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+//        String currentDateTime = dateFormatter.format(new Date());
+
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Europe/Bucharest"));
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=users_" + localDateTime + ".pdf";
+        response.setHeader(headerKey, headerValue);
+
+        converter.convert(response);
+    }
+
 
 }
