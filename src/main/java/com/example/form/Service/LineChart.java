@@ -14,29 +14,31 @@ public class LineChart {
     public static void generateLineChart(ArrayList<BankCredit> bankCredits) throws IOException {
 
         DefaultCategoryDataset line_chart_dataset = new DefaultCategoryDataset();
-        int i = 0;
-        /*while(i <= 100){
-            line_chart_dataset.addValue(0, "number of requests", String.valueOf(bankCredits.get(i).getId()));
+        int i = 59;
+        while(i < 59 + bankCredits.size()){
+            line_chart_dataset.addValue((int)bankCredits.get(i-59).getMoney(), "Solicitari in ordine temporala",
+                    String.valueOf(i));
+            System.out.println(bankCredits.get(i-59).getMoney());
             i++;
-        }*/
-        for(BankCredit a : bankCredits){
+        }
+        /*for(BankCredit a : bankCredits){
             line_chart_dataset.addValue(0, "number of requests", String.valueOf(a.getId()));
-        }
+        }*/
 
 
 
 
-        for(BankCredit bankCredit : bankCredits){
+        /*for(BankCredit bankCredit : bankCredits){
             line_chart_dataset.addValue(line_chart_dataset
-                            .getValue("number of requests", String.valueOf((long)bankCredit.getCredit_interest())).intValue() + 1,
+                            .getValue("number of requests", String.valueOf((long)bankCredit.getId())).intValue(),
                     "number of requests",
-                    String.valueOf((long)bankCredit.getCredit_interest()));
-        }
+                    String.valueOf((long)bankCredit.getMoney()));
+        }*/
 
         JFreeChart lineChartObject = ChartFactory.createLineChart(
-                "Rate imprumuturi",
-                "Rate",
-                "Number of requests",
+                "Sume solicitate",
+                "Id client",
+                "Suma",
                 line_chart_dataset,
                 PlotOrientation.VERTICAL,
                 true,
@@ -44,8 +46,8 @@ public class LineChart {
                 false
         );
 
-        int width = 480;
-        int height = 260;
+        int width = 680;
+        int height = 420;
         File lineChart = new File("LineChart.jpeg");
         ChartUtilities.saveChartAsJPEG(lineChart, lineChartObject, width, height);
     }

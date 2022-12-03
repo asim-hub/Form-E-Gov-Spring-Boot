@@ -24,7 +24,7 @@ public class Converter implements ConverterService{
 
     public void convert(HttpServletResponse response) {
 
-        Document document = new Document(PageSize.A4);
+        Document document = new Document(PageSize.A4.rotate());
         try {
             PdfWriter.getInstance(document,
                     response.getOutputStream());
@@ -32,7 +32,7 @@ public class Converter implements ConverterService{
             document.open();
 
             // 1. --->create a paragraph and add it to the document<---
-            Paragraph p = new Paragraph("The next item will be a table");
+            Paragraph p = new Paragraph("Tabel de solicitari");
             p.setAlignment(Paragraph.ALIGN_CENTER);
             document.add(p);
 
@@ -41,14 +41,15 @@ public class Converter implements ConverterService{
 
             //3. --->create a pie chart and add it to the document<---
             String pieChartTitle = "PieChart";
-            pieChart_awt.PieChartFactory(pieChartTitle, new ArrayList< BankCredit >(bankCreditService.getAllBankCredit()), 480, 260);
+            pieChart_awt.PieChartFactory(pieChartTitle, new ArrayList< BankCredit >(bankCreditService.getAllBankCredit()), 650, 420);
             Image jpegPieChart = Image.getInstance(pieChartTitle + ".jpeg");
-
+            jpegPieChart.setAlignment(Image.ALIGN_CENTER);
             document.add(jpegPieChart);
 
             //4. --->create a line chart and add it to the document<---
             lineChart.generateLineChart( new ArrayList< BankCredit >(bankCreditService.getAllBankCredit()));
             Image jpegLineChart = Image.getInstance("LineChart.jpeg");
+            jpegLineChart.setAlignment(Image.ALIGN_CENTER);
             document.add(jpegLineChart);
 
         } catch (DocumentException de) {
