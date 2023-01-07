@@ -1,0 +1,225 @@
+version: "3.7"
+
+services:
+  loki:
+    container_name: loki
+    image: grafana/loki:2.5.0
+    restart: unless-stopped
+    volumes:
+      - ./loki:/etc/loki
+    ports:
+      - $LOKI_DOCKER_PORT:$LOKI_LOCAL_PORT
+    command: -config.file=/etc/loki/loki-config.yaml
+    networks:
+      - loki
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}|{{.ImageName}}|{{.ImageFullID}}|{{.FullID}}"
+
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:2.5.0
+    restart: unless-stopped
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./promtail/promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - loki
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}|{{.ImageName}}|{{.ImageFullID}}|{{.FullID}}"
+
+  grafana:
+    container_name: grafana
+    build: ./grafana
+    restart: unless-stopped
+    ports:
+      - $GRAFANA_DOCKER_PORT:$GRAFANA_LOCAL_PORT
+    networks:
+      - loki
+      - default
+    volumes:
+      - ./grafana/grafana-storage:/var/lib/grafana
+    user: "${UID_GID}"
+    environment:
+      # grafana
+      GF_SECURITY_ADMIN_USER: $GRAFANA_USER
+      GF_SECURITY_ADMIN_PASSWORD: $GRAFANA_PASSWORD
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+      GF_SERVER_PROTOCOL: https
+      GF_SERVER_CERT_KEY: /etc/grafana/grafana.key
+      GF_SERVER_CERT_FILE: /etc/grafana/grafana.crt
+      # proxy
+      VIRTUAL_HOST: $GRAFANA_PROXY_ADDRESS
+      VIRTUAL_PROTO: https
+      VIRTUAL_PORT: 3000
+      CERT_NAME: grafana
+    extra_hosts:
+      - "$GRAFANA_PROXY_ADDRESS:127.0.0.1"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}|{{.ImageName}}|{{.ImageFullID}}|{{.FullID}}"
+
+  mysqldb:
+    container_name: mysqldb
+    build: ./mysql
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    ports:
+      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+    user: "${UID_GID}"
+    volumes:
+      - ./mysql/mysql-data:/var/lib/mysql
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}|{{.ImageName}}|{{.ImageFullID}}|{{.FullID}}"
+
+  app:
+    container_name: spring-app
+    depends_on:
+      - mysqldb
+    build: ./
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - $SPRING_DOCKER_PORT:$SPRING_LOCAL_PORT
+    environment:
+      # proxy
+      VIRTUAL_HOST: $SPRING_PROXY_ADDRESS
+      VIRTUAL_PROTO: https
+      VIRTUAL_PORT: $SPRING_DOCKER_PORT
+      CERT_NAME: spring
+      # spring
+      SPRING_APPLICATION_JSON: '{
+          "spring.datasource.url"  : "jdbc:mysql://mysqldb:$MYSQLDB_DOCKER_PORT/$MYSQLDB_DATABASE",
+          "spring.datasource.username" : "$MYSQLDB_USER",
+          "spring.datasource.password" : "$MYSQLDB_ROOT_PASSWORD",
+          "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL5InnoDBDialect",
+          "spring.jpa.hibernate.ddl-auto" : "update"
+        }'
+    volumes:
+      - ./.m2:/root/.m2
+      - ./logs:/workspace/logs
+      - ./test-results:/target/surefire-reports
+    stdin_open: true
+    tty: true
+    extra_hosts:
+      - "$SPRING_PROXY_ADDRESS:127.0.0.1"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}|{{.ImageName}}|{{.ImageFullID}}|{{.FullID}}"
+
+  adminer:
+    container_name: adminer
+    depends_on:
+      - mysqldb
+    build: ./adminer
+    restart: unless-stopped
+    environment:
+      # proxy
+      VIRTUAL_HOST: $ADMINER_PROXY_ADDRESS
+      CERT_NAME: adminer
+      # adminer
+      ADMINER_DEFAULT_SERVER: mysqldb
+      ADMINER_DESIGN: 'pepa-linha'
+      ADMINER_PLUGINS: 'tables-filter tinymce dump-json dump-alter version-noverify foreign-system'
+    ports:
+      - $ADMINER_DOCKER_PORT:$ADMINER_LOCAL_PORT
+    extra_hosts:
+      - "$ADMINER_PROXY_ADDRESS:127.0.0.1"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}|{{.ImageName}}|{{.ImageFullID}}|{{.FullID}}"
+
+  portainer:
+    container_name: portainer
+    depends_on:
+      - mysqldb
+      - adminer
+      - app
+    build: ./portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    user: "${UID_GID}"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./portainer/portainer-data:/data
+    ports:
+      - $PORTAINER_DOCKER_PORT:$PORTAINER_LOCAL_PORT
+    environment:
+      #proxy
+      VIRTUAL_HOST: $PORTAINER_PROXY_ADDRESS
+      VIRTUAL_PROTO: https
+      VIRTUAL_PORT: $PORTAINER_DOCKER_PORT
+      CERT_NAME: portainer
+    extra_hosts:
+      - "$PORTAINER_PROXY_ADDRESS:127.0.0.1"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}|{{.ImageName}}|{{.ImageFullID}}|{{.FullID}}"
+
+  nginx-proxy:
+    container_name: nginx-proxy
+    depends_on:
+      - portainer
+    image: jwilder/nginx-proxy
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx/certs:/etc/nginx/certs
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.Name}}|{{.ImageName}}|{{.ImageFullID}}|{{.FullID}}"
+
+  kong:
+    container_name: kong
+    image: kong:2.2.0
+    environment:
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: '0.0.0.0:8001'
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+    volumes:
+      - ./kong/:/usr/local/kong/declarative
+    networks:
+      - kong-net
+    ports:
+      - "8000:8000/tcp"
+      - "127.0.0.1:8001:8001/tcp"
+      - "8448:8448/tcp"
+      - "127.0.0.1:8444:8444/tcp"
+    healthcheck:
+      test: [ "CMD", "kong", "health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: on-failure
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+networks:
+  loki:
+  rabbitmq:
+  kong-net:
+    external: false

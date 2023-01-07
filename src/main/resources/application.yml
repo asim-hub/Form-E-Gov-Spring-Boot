@@ -1,0 +1,22 @@
+spring:
+  thymeleaf:
+    template-loader-path: classpath:/templates
+    suffix: .html
+    cache: false
+    mode: HTML5
+  main:
+    allow-circular-references: true
+  messages:
+    basename: validation
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: hrmanagerspring@gmail.com
+    password: kobnswamlnqcbcdm
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true

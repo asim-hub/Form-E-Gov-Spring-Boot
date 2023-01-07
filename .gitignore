@@ -57,3 +57,7 @@ build/
 ### VS Code ###
 .vscode/
 
+### Data ###
+./mysql/mysqldata/*
+./portainer/portainer-data/*
+./grafana/grafana-storage/*
