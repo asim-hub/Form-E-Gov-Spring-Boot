@@ -11,7 +11,7 @@ services:
         methods:
           - GET
         paths:
-          - /weather/general/outlook
+          - /newBankRequest
         strip_path: false
       - tags:
           - OAS3_import
@@ -20,17 +20,17 @@ services:
         methods:
           - POST
         paths:
-          - /weather/general/outlook
+          - /newBankRequest
         strip_path: false
-      - tags:
-          - OAS3_import
-          - OAS3file_openapi.json
-        name: formbackend-path_2-get
-        methods:
-          - GET
-        paths:
-          - /weather/(?<name>\S+)$
-        strip_path: false
+#      - tags:
+#          - OAS3_import
+#          - OAS3file_openapi.json
+#        name: formbackend-path_2-get
+#        methods:
+#          - GET
+#        paths:
+#          - /weather/(?<name>\S+)$
+#        strip_path: false
     tags:
       - OAS3_import
       - OAS3file_openapi.json

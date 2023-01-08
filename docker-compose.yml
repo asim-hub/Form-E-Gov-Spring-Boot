@@ -189,6 +189,7 @@ services:
         tag: "{{.Name}}|{{.ImageName}}|{{.ImageFullID}}|{{.FullID}}"
 
   kong:
+    container_name: kong
     image: kong:2.8.3
     environment:
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
