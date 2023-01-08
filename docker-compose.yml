@@ -189,8 +189,7 @@ services:
         tag: "{{.Name}}|{{.ImageName}}|{{.ImageFullID}}|{{.FullID}}"
 
   kong:
-    container_name: kong
-    image: kong:2.2.0
+    image: kong:2.8.3
     environment:
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ERROR_LOG: /dev/stderr
@@ -206,7 +205,7 @@ services:
     ports:
       - "8000:8000/tcp"
       - "127.0.0.1:8001:8001/tcp"
-      - "8448:8448/tcp"
+      - "8443:8443/tcp"
       - "127.0.0.1:8444:8444/tcp"
     healthcheck:
       test: [ "CMD", "kong", "health" ]

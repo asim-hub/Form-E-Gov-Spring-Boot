@@ -1,0 +1,43 @@
+_format_version: "1.1"
+services:
+  - name: formbackend
+    url: http://formbackend:8080
+    plugins: []
+    routes:
+      - tags:
+          - OAS3_import
+          - OAS3file_openapi.json
+        name: formbackend-path-get
+        methods:
+          - GET
+        paths:
+          - /weather/general/outlook
+        strip_path: false
+      - tags:
+          - OAS3_import
+          - OAS3file_openapi.json
+        name: formbackend-path_1-post
+        methods:
+          - POST
+        paths:
+          - /weather/general/outlook
+        strip_path: false
+      - tags:
+          - OAS3_import
+          - OAS3file_openapi.json
+        name: formbackend-path_2-get
+        methods:
+          - GET
+        paths:
+          - /weather/(?<name>\S+)$
+        strip_path: false
+    tags:
+      - OAS3_import
+      - OAS3file_openapi.json
+upstreams:
+  - name: formbackend
+    targets:
+      - target: formbackend:8080
+    tags:
+      - OAS3_import
+      - OAS3file_openapi.json
