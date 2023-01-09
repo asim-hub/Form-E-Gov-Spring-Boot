@@ -10,7 +10,7 @@ spec:
         - name: KONG_DATABASE
           value: 'off'
         - name: KONG_DECLARATIVE_CONFIG_STRING
-          value: '{"_format_version":"1.1", "services":[{"name":"formbackend","url":"http://formbackend:8080","port":8080,"protocol":"http", "routes":[{"paths":["/newBankRequest"]}]}],"plugins":[{"name":"cors", "config":{"origins":["*"]}}]}'
+          value: '{"_format_version":"1.1", "services":[{"name":"form-k8s","url":"http://form-k8s:8080","port":8080,"protocol":"http", "routes":[{"paths":["/newBankRequest"]}]}],"plugins":[{"name":"cors", "config":{"origins":["*"]}}]}'
         - name: KONG_PROXY_ACCESS_LOG
           value: /dev/stdout
         - name: KONG_ADMIN_ACCESS_LOG

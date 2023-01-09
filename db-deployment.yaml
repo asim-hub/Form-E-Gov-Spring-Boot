@@ -1,56 +1,56 @@
 # PVC (Persistent Volume Claim)
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv-volumeee
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pv-claim
-  labels:
-    app: mysql
-    tier: database
+  name: mysql-pv-claimmm
 spec:
+  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi
 ---
 # "Deployment"
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
-  labels:
-    app: mysql
-    tier: database
 spec:
   selector:
     matchLabels:
       app: mysql
-      tier: database
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         app: mysql
-        tier: database
     spec:
       containers:
         - image: mysql:latest
           name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
-              valueFrom :
-                secretKeyRef :
-                  name : mysql-secrets
-                  key :  password
-
-            - name: MYSQL_DATABASE
-              valueFrom :
-                configMapKeyRef :
-                  name : db-config
-                  key :  dbName
-
-
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: password
           ports:
             - containerPort: 3306
               name: mysql
@@ -60,21 +60,18 @@ spec:
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
-            claimName: mysql-pv-claim
+            claimName: mysql-pv-claimmm
 ---
 # "Service"
 apiVersion: v1
 kind: Service
 metadata:
   name: mysql
-  labels:
-    app: mysql
-    tier: database
 spec:
+  type: NodePort
   ports:
     - port: 3306
       targetPort: 3306
+      nodePort: 30306
   selector:
     app: mysql
-    tier: database
-  clusterIP: None
